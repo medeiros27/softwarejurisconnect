@@ -1,0 +1,276 @@
+/* Estilos personalizados para o Sistema de Gestão de Correspondentes Jurídicos */
+
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #2c3e50;
+  --success-color: #2ecc71;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+  --info-color: #3498db;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+/* Sobrescrever cores do Bootstrap */
+.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.btn-primary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+.btn-outline-primary {
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.border-primary {
+  border-color: var(--secondary-color) !important;
+}
+
+.text-primary {
+  color: var(--secondary-color) !important;
+}
+
+/* Cabeçalho */
+header {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Cards */
+.card {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Carousel */
+.carousel-item img {
+  border-radius: 8px;
+  height: 300px;
+  object-fit: cover;
+}
+
+/* Formulários */
+.form-control:focus {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+}
+
+/* Sidebar para dashboards */
+.sidebar {
+  background-color: var(--primary-color);
+  color: white;
+  min-height: calc(100vh - 56px);
+  padding-top: 20px;
+}
+
+.sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 10px 20px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.sidebar .nav-link i {
+  margin-right: 10px;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+  border-left: 4px solid var(--secondary-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card.card-primary {
+  border-left-color: var(--secondary-color);
+}
+
+.dashboard-card.card-success {
+  border-left-color: var(--success-color);
+}
+
+.dashboard-card.card-warning {
+  border-left-color: var(--warning-color);
+}
+
+.dashboard-card.card-danger {
+  border-left-color: var(--danger-color);
+}
+
+/* Tabelas */
+.table-hover tbody tr:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Status badges */
+.badge.bg-pending {
+  background-color: #f39c12;
+}
+
+.badge.bg-approved {
+  background-color: #3498db;
+}
+
+.badge.bg-assigned {
+  background-color: #9b59b6;
+}
+
+.badge.bg-accepted {
+  background-color: #1abc9c;
+}
+
+.badge.bg-in-progress {
+  background-color: #2ecc71;
+}
+
+.badge.bg-completed {
+  background-color: #27ae60;
+}
+
+.badge.bg-cancelled {
+  background-color: #e74c3c;
+}
+
+/* Animações */
+.fade-in {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .carousel-item img {
+    height: 200px;
+  }
+  
+  .sidebar {
+    min-height: auto;
+  }
+}
+
+/* Footer */
+footer a {
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* Notificações */
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  padding: 3px 6px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 0.7rem;
+}
+
+/* Timeline para acompanhamento de solicitações */
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--secondary-color);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -30px;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  border: 2px solid var(--secondary-color);
+}
+
+.timeline-item.active::before {
+  background-color: var(--secondary-color);
+}
+
+/* Tooltips personalizados */
+.custom-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-tooltip .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: var(--dark-color);
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.custom-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
