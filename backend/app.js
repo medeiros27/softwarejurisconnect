@@ -20,11 +20,11 @@ app.use('/api/usuarios', userRoutes);
 
 // Rota de teste
 app.get('/', (req, res) => {
-  res.send('API rodando!');
+  res.send('API online!');
 });
 
 // Porta
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+app.listen(5000, () => {
+  console.log('Server running on http://localhost:5000');
 });

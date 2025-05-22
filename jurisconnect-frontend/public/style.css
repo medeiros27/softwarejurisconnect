@@ -13,9 +13,12 @@
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
   color: #333;
   background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 
 /* Sobrescrever cores do Bootstrap */
@@ -24,23 +27,29 @@ body {
 }
 
 .btn-primary {
-  background-color: var(--secondary-color);
-  border-color: var(--secondary-color);
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+  color: #fff !important;
 }
 
-.btn-primary:hover {
-  background-color: #2980b9;
-  border-color: #2980b9;
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #2980b9 !important;
+  border-color: #2980b9 !important;
+  color: #fff !important;
 }
 
 .btn-outline-primary {
-  color: var(--secondary-color);
-  border-color: var(--secondary-color);
+  color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+  background-color: transparent !important;
 }
 
-.btn-outline-primary:hover {
-  background-color: var(--secondary-color);
-  border-color: var(--secondary-color);
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+  color: #fff !important;
 }
 
 .border-primary {
@@ -73,18 +82,21 @@ header {
   border-radius: 8px;
   height: 300px;
   object-fit: cover;
+  width: 100%;
+  display: block;
 }
 
 /* Formulários */
 .form-control:focus {
   border-color: var(--secondary-color);
   box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+  outline: none;
 }
 
 /* Sidebar para dashboards */
 .sidebar {
   background-color: var(--primary-color);
-  color: white;
+  color: #fff;
   min-height: calc(100vh - 56px);
   padding-top: 20px;
 }
@@ -95,12 +107,13 @@ header {
   margin-bottom: 5px;
   border-radius: 5px;
   transition: all 0.3s;
+  display: block;
 }
 
 .sidebar .nav-link:hover,
 .sidebar .nav-link.active {
   background-color: rgba(255, 255, 255, 0.1);
-  color: white;
+  color: #fff;
 }
 
 .sidebar .nav-link i {
@@ -112,6 +125,9 @@ header {
   border-left: 4px solid var(--secondary-color);
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 
 .dashboard-card.card-primary {
@@ -137,31 +153,38 @@ header {
 
 /* Status badges */
 .badge.bg-pending {
-  background-color: #f39c12;
+  background-color: #f39c12 !important;
+  color: #fff;
 }
 
 .badge.bg-approved {
-  background-color: #3498db;
+  background-color: #3498db !important;
+  color: #fff;
 }
 
 .badge.bg-assigned {
-  background-color: #9b59b6;
+  background-color: #9b59b6 !important;
+  color: #fff;
 }
 
 .badge.bg-accepted {
-  background-color: #1abc9c;
+  background-color: #1abc9c !important;
+  color: #fff;
 }
 
 .badge.bg-in-progress {
-  background-color: #2ecc71;
+  background-color: #2ecc71 !important;
+  color: #fff;
 }
 
 .badge.bg-completed {
-  background-color: #27ae60;
+  background-color: #27ae60 !important;
+  color: #fff;
 }
 
 .badge.bg-cancelled {
-  background-color: #e74c3c;
+  background-color: #e74c3c !important;
+  color: #fff;
 }
 
 /* Animações */
@@ -206,7 +229,7 @@ footer a:hover {
   padding: 3px 6px;
   border-radius: 50%;
   background-color: var(--accent-color);
-  color: white;
+  color: #fff;
   font-size: 0.7rem;
 }
 
@@ -239,7 +262,7 @@ footer a:hover {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background-color: white;
+  background-color: #fff;
   border: 2px solid var(--secondary-color);
 }
 
@@ -257,7 +280,7 @@ footer a:hover {
   visibility: hidden;
   width: 200px;
   background-color: var(--dark-color);
-  color: white;
+  color: #fff;
   text-align: center;
   border-radius: 6px;
   padding: 5px;
