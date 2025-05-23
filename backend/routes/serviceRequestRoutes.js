@@ -1,20 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const serviceRequestController = require('../controllers/serviceRequestController');
+const asyncHandler = require('../middleware/async');
+const requireLogin = require('../middleware/auth');
 
-// GET /api/service-requests
-router.get('/', (req, res) => {
-  res.json([
-    { id: 1, descricao: 'Pedido de diligência', status: 'Aberto' },
-    { id: 2, descricao: 'Acompanhamento de processo', status: 'Concluído' }
-  ]);
-});
+// Listar e criar solicitações
+router.get('/', asyncHandler(serviceRequestController.getServiceRequests));
+router.post('/', requireLogin, asyncHandler(serviceRequestController.createServiceRequest));
 
-// POST /api/service-requests
-router.post('/', (req, res) => {
-  // Exemplo de criação simulada
-  const novoPedido = req.body;
-  novoPedido.id = Date.now();
-  res.status(201).json(novoPedido);
-});
+// Obter, atualizar, excluir por ID
+router.get('/:id', asyncHandler(serviceRequestController.getServiceRequestById));
+router.put('/:id', requireLogin, asyncHandler(serviceRequestController.updateServiceRequest));
+router.delete('/:id', requireLogin, asyncHandler(serviceRequestController.deleteServiceRequest));
 
 module.exports = router;

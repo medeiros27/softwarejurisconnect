@@ -206,9 +206,9 @@ CorrespondentSchema.methods.isAvailableFor = function(city, state) {
   if (this.availability === 'indisponível') {
     return false;
   }
-  
-  return this.serviceAreas.some(area => 
-    area.state === state && 
+
+  return this.serviceAreas.some(area =>
+    area.state === state &&
     (area.city.toLowerCase() === city.toLowerCase() || area.radius > 0)
   );
 };

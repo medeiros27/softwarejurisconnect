@@ -182,7 +182,7 @@ const ServiceRequestSchema = new mongoose.Schema({
 // Middleware para atualizar o timestamp de atualização
 ServiceRequestSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
-  
+
   // Adiciona histórico de status se o status foi alterado
   if (this.isModified('status')) {
     this.statusHistory.push({
@@ -191,7 +191,7 @@ ServiceRequestSchema.pre('save', function(next) {
       notes: `Status alterado para ${this.status}`
     });
   }
-  
+
   next();
 });
 
@@ -205,7 +205,7 @@ ServiceRequestSchema.methods.isOverdue = function() {
   if (['concluida', 'cancelada', 'rejeitada'].includes(this.status)) {
     return false;
   }
-  
+
   return new Date() > this.deadline;
 };
 

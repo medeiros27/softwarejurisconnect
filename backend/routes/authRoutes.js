@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
+const authController = require('../controllers/authController');
 
-// POST /api/auth/login
-router.post('/login', (req, res) => {
-  // Implemente lógica real de autenticação aqui
-  res.json({ success: true, message: 'Login efetuado (mock)' });
-});
+// Cadastro
+router.post('/signup', authController.signup);
 
-// POST /api/auth/register
-router.post('/register', (req, res) => {
-  // Implemente lógica real de cadastro aqui
-  res.json({ success: true, message: 'Registro efetuado (mock)' });
-});
+// Login, logout, me
+router.post('/login', authController.login);
+router.post('/logout', authController.logout);
+router.get('/me', authController.me);
+
+// Recuperação de senha
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password/:token', authController.resetPassword);
 
 module.exports = router;

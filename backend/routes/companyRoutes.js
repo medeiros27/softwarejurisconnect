@@ -1,9 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const companyController = require('../controllers/companyController');
+const asyncHandler = require('../middleware/async');
+const requireLogin = require('../middleware/auth');
 
-// GET /api/companies
-router.get('/', (req, res) => {
-  res.json([{ id: 1, nome: 'Empresa Exemplo' }]);
-});
+// Listar e criar empresas
+router.get('/', asyncHandler(companyController.getCompanies));
+router.post('/', requireLogin, asyncHandler(companyController.createCompany));
+
+// Obter, atualizar, excluir por ID
+router.get('/:id', asyncHandler(companyController.getCompanyById));
+router.put('/:id', requireLogin, asyncHandler(companyController.updateCompany));
+router.delete('/:id', requireLogin, asyncHandler(companyController.deleteCompany));
 
 module.exports = router;

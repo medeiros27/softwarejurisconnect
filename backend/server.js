@@ -1,197 +1,77 @@
-require('dotenv').config();
 const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-const session = require('express-session');
-const flash = require('connect-flash');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const multer = require('multer');
-const nodemailer = require('nodemailer');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const cors = require('cors');
+const path = require('path');
+const dotenv = require('dotenv');
+const errorHandler = require('./middleware/errorHandler');
+
+// Carrega variáveis de ambiente do .env
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// =======================
-// MONGODB CONFIG
-// =======================
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Conectado ao MongoDB!'))
-  .catch(err => console.error('Erro MongoDB:', err));
+// Middleware para arquivos estáticos (logo, etc.)
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
-const User = require('./models/User');
-const Company = require('./models/Company');
-const Correspondent = require('./models/Correspondent');
-const empresasRouter = require('./routes/empresas');
+// Middleware global CORS
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+  })
+);
 
-// =======================
-// MIDDLEWARES
-// =======================
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use('/api/empresas', empresasRouter);
+// Middleware para ler JSON
+app.use(express.json());
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'jurisconnect_secret_key_123',
+// Sessão armazenada no MongoDB
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'minha_sessao_secreta',
     resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 2 * 60 * 60 * 1000 }
-}));
-app.use(flash());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// =======================
-// MULTER CONFIG (UPLOADS)
-// =======================
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, 'uploads/');
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: 'sessions',
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 dia
+      sameSite: 'lax',
+      secure: false, // true apenas se https
     },
-    filename: function(req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
+  })
+);
+
+// Conexão com MongoDB
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('Conectado ao MongoDB!'))
+  .catch((err) => {
+    console.error('Erro ao conectar ao MongoDB:', err.message);
+    process.exit(1);
+  });
+
+// Rotas de autenticação
+app.use('/api/auth', require('./routes/authRoutes'));
+
+// Rotas de empresas
+app.use('/api/companies', require('./routes/companyRoutes'));
+
+// Rotas de correspondentes
+app.use('/api/correspondents', require('./routes/correspondentRoutes'));
+
+// Rotas de solicitações de serviço
+app.use('/api/service-requests', require('./routes/serviceRequestRoutes'));
+
+// Middleware de tratamento de erros (deve ser o último)
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
-const upload = multer({ storage: storage });
-
-// =======================
-// NODEMAILER CONFIG (E-MAIL)
-// =======================
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
-    }
-});
-
-// =======================
-// MIDDLEWARES DE AUTENTICAÇÃO
-// =======================
-function requireLogin(req, res, next) {
-    if (!req.session.user) return res.redirect('/login.html');
-    next();
-}
-function requireAdmin(req, res, next) {
-    if (!req.session.user || req.session.user.role !== 'admin') return res.status(403).send('Acesso restrito.');
-    next();
-}
-
-// =======================
-// ROTAS PRINCIPAIS
-// =======================
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cadastro.html')));
-
-// =======================
-// CADASTRO DE USUÁRIO COM E-MAIL DE CONFIRMAÇÃO
-// =======================
-app.post('/cadastro', async (req, res) => {
-    const { role, name, email, password, confirm_password, terms } = req.body;
-    if (!role || !name || !email || !password || !confirm_password || !terms) {
-        return res.json({ success: false, message: 'Preencha todos os campos obrigatórios!' });
-    }
-    if (password !== confirm_password) {
-        return res.json({ success: false, message: 'As senhas não coincidem.' });
-    }
-    // Verifica se já existe
-    const exists = await User.findOne({ email }) ||
-                   await Company.findOne({ email }) ||
-                   await Correspondent.findOne({ email });
-    if (exists) {
-        return res.json({ success: false, message: 'E-mail já cadastrado!' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    let user;
-    if (role === 'company') {
-        user = new Company({ ...req.body, password: hashedPassword });
-        await user.save();
-    } else if (role === 'correspondent') {
-        user = new Correspondent({ ...req.body, password: hashedPassword });
-        await user.save();
-    } else if (role === 'admin') {
-        user = new User({ ...req.body, password: hashedPassword, role: 'admin' });
-        await user.save();
-    }
-
-    // Envia e-mail de boas-vindas
-    await transporter.sendMail({
-        from: process.env.MAIL_USER,
-        to: email,
-        subject: 'Bem-vindo ao JurisConnect',
-        text: `Olá, ${name}!\nSeu cadastro foi realizado com sucesso.`
-    });
-
-    res.json({ success: true, message: 'Cadastro realizado! Verifique seu e-mail.' });
-});
-
-// =======================
-// LOGIN
-// =======================
-app.post('/login', async (req, res) => {
-    const { email, password, user_type } = req.body;
-    let user;
-    if (user_type === 'admin') {
-        user = await User.findOne({ email, role: 'admin' });
-    } else if (user_type === 'company') {
-        user = await Company.findOne({ email });
-    } else if (user_type === 'correspondent') {
-        user = await Correspondent.findOne({ email });
-    }
-    if (user && await bcrypt.compare(password, user.password)) {
-        req.session.user = {
-            id: user._id,
-            name: user.name,
-            role: user.role || user_type,
-            email: user.email
-        };
-        res.json({ success: true, redirect: '/dashboard.html' });
-    } else {
-        res.json({ success: false, message: 'Usuário ou senha inválidos!' });
-    }
-});
-
-app.get('/logout', (req, res) => {
-    req.session.destroy(() => res.redirect('/login.html'));
-});
-
-// =======================
-// UPLOAD DE ARQUIVOS (EXEMPLO)
-// =======================
-app.post('/upload', requireLogin, upload.single('arquivo'), (req, res) => {
-    // O campo do formulário deve ser <input type="file" name="arquivo" />
-    if (req.file) {
-        res.json({ success: true, filename: req.file.filename, url: '/uploads/' + req.file.filename });
-    } else {
-        res.json({ success: false, message: 'Nenhum arquivo enviado!' });
-    }
-});
-
-// =======================
-// DASHBOARD PROTEGIDO
-// =======================
-app.get('/dashboard.html', requireLogin, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
-
-// =======================
-// 404
-// =======================
-app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
-});
-
-// =======================
-// INICIA SERVIDOR
-// =======================
-app.listen(3000, () => console.log('Servidor rodando!'));
-
-/*
-Crie um arquivo .env assim:
-MONGODB_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/jurisconnect?retryWrites=true&w=majority
-SESSION_SECRET=algumasecret
-MAIL_USER=seuemail@gmail.com
-MAIL_PASS=suaSenhaOuAppPassword
-*/
