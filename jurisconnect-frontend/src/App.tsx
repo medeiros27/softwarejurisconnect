@@ -2,12 +2,15 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 // Importe suas páginas
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import NavBar from "./components/NavBar";
+import Login from "./components/Login";
+import Register from "./components/Register";
 import Dashboard from "./pages/Dashboard";
-import Companies from "./pages/Companies";
-import Correspondents from "./pages/Correspondents";
-import ServiceRequests from "./pages/ServiceRequests";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Empresas from "./pages/Empresas";
+import Correspondentes from "./pages/Correspondentes";
+import Solicitacoes from "./pages/Solicitacoes";
 
 // Exemplo de componente de proteção de rota (opcional)
 function PrivateRoute({ children }) {
@@ -65,4 +68,4 @@ function App() {
   );
 }
 
-export default App;
+export default function App() { /* ... */ }
