@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography, Box, Grid, Paper } from '@mui/material';
-import { useAuthContext } from '../contexts/AuthContext';
-import Logo from '../components/Logo';
+import { useAuth } from '../contexts/AuthContext';
+import Logo from '../components/logo';
 
 export default function Dashboard() {
   const { user } = useAuthContext();

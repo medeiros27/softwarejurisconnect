@@ -1,71 +1,107 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-
-// Importe suas páginas
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import NavBar from "./components/NavBar";
-import Login from "./components/Login";
-import Register from "./components/Register";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Empresas from "./pages/Empresas";
-import Correspondentes from "./pages/Correspondentes";
-import Solicitacoes from "./pages/Solicitacoes";
+import Companies from "./pages/Companies";
+import Correspondents from "./pages/Correspondents";
+import ServiceRequests from "./pages/ServiceRequests";
 
-// Exemplo de componente de proteção de rota (opcional)
-function PrivateRoute({ children }) {
-  // Implemente seu controle de autenticação aqui
-  const isAuthenticated = !!localStorage.getItem("token");
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-}
+const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    !!localStorage.getItem("token")
+  );
 
-function App() {
+  const handleLogin = (token: string) => {
+    localStorage.setItem("token", token);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+  };
+
   return (
     <Router>
+      <NavBar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-
-        {/* Rotas privadas */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Register onRegister={handleLogin} />
+            )
+          }
+        />
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute>
+            isAuthenticated ? (
               <Dashboard />
-            </PrivateRoute>
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
         <Route
           path="/companies"
           element={
-            <PrivateRoute>
+            isAuthenticated ? (
               <Companies />
-            </PrivateRoute>
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
         <Route
           path="/correspondents"
           element={
-            <PrivateRoute>
+            isAuthenticated ? (
               <Correspondents />
-            </PrivateRoute>
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
         <Route
           path="/servicerequests"
           element={
-            <PrivateRoute>
+            isAuthenticated ? (
               <ServiceRequests />
-            </PrivateRoute>
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
-
-        {/* Redirecionamentos */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="*" element={<div>Página não encontrada</div>} />
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
-}
+};
 
-export default function App() { /* ... */ }
+export default App;

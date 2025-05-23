@@ -2,6 +2,8 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/Logo versao 1.png";
 import "./NavBar.css";
+import { useAuth } from "../contexts/AuthContext";
+// e acesse login, logout, isAuthenticated, token, etc
 
 type NavBarProps = {
   user?: { nome?: string; name?: string };

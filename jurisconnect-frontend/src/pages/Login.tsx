@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Avatar, Button, TextField, Grid, Box, Typography, Container, Alert } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
-import Logo from '../components/Logo';
-import { useAuthContext } from '../contexts/AuthContext';
+import Logo from "../components/logo";
+import { useAuth } from '../contexts/AuthContext';
 import { login as apiLogin } from '../services/api';
 
 export default function Login() {

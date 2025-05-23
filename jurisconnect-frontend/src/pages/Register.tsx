@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Avatar, Button, TextField, Grid, Box, Typography, Container, Alert } from '@mui/material';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { useNavigate } from 'react-router-dom';
-import Logo from '../components/Logo';
+import Logo from '../components/logo';
 import { register as apiRegister } from '../services/api';
 
 export default function Register() {
