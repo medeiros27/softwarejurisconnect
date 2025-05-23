@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JurisConnect</title>
+  <!-- Favicon: Logo versão 3 (ícone isolado, fundo escuro) -->
+  <link rel="icon" type="image/png" href="logo-v3-icon-dark.png">
+  <link rel="stylesheet" href="style.css"/>
+  <!-- Bootstrap moderno, CDN oficial -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <!-- Google Fonts: Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <style>
+    body { font-family: 'Roboto', Arial, Helvetica, sans-serif; }
+    .navbar-logo { height: 40px; }
+    .doc-header-logo { height: 50px; }
+    .avatar-logo { height: 32px; width: 32px; border-radius: 50%; }
+    .watermark-logo {
+      opacity: 0.10;
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      height: 80px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .navbar { border-radius: 0 0 16px 16px; }
+    @media (max-width: 768px) {
+      .dashboard-card { margin-bottom: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- Logo versão 1 (símbolo + texto, fundo escuro) -->
+    <nav class="navbar navbar-expand-lg bg-primary navbar-dark px-4 py-3 shadow-sm">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="logo-v1-dark.png" alt="JurisConnect Logo" class="navbar-logo">
+        <span class="fw-bold fs-4 ms-2">JurisConnect</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="login.html">Entrar</a></li>
+          <li class="nav-item"><a class="nav-link" href="register.html">Registrar</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container-xl mt-5 fade-in position-relative" style="min-height: 70vh;">
+    <!-- Logo versão 2 (símbolo + texto, fundo claro) em cabeçalhos de documentos -->
+    <section class="document-header text-center mb-4">
+      <img src="logo-v2-light.png" alt="JurisConnect Logo Documento" class="doc-header-logo">
+    </section>
+
+    <section class="text-center mb-5">
+      <h1 class="fw-bold mb-3">Bem-vindo ao <span class="text-primary">JurisConnect</span></h1>
+      <p class="lead">O sistema completo para a gestão de correspondentes jurídicos no Brasil.</p>
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="login.html" class="btn btn-primary btn-lg shadow-sm">Entrar</a>
+        <a href="register.html" class="btn btn-outline-primary btn-lg">Registrar</a>
+      </div>
+    </section>
+
+    <section class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div class="card dashboard-card card-primary h-100 p-4 text-center border-0 shadow-sm">
+          <div class="mb-2">
+            <i class="bi bi-clipboard-data fs-1 text-primary"></i>
+          </div>
+          <h4 class="fw-bold mb-2">Gestão de Solicitações</h4>
+          <p class="text-secondary">Gerencie solicitações jurídicas com facilidade, atribuição automática e acompanhamento em tempo real.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card dashboard-card card-success h-100 p-4 text-center border-0 shadow-sm">
+          <div class="mb-2">
+            <i class="bi bi-people fs-1 text-success"></i>
+          </div>
+          <h4 class="fw-bold mb-2">Painel de Correspondentes</h4>
+          <p class="text-secondary">Visualize e gerencie seu time de correspondentes, status de atuação e áreas de atendimento.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card dashboard-card card-warning h-100 p-4 text-center border-0 shadow-sm">
+          <div class="mb-2">
+            <i class="bi bi-graph-up-arrow fs-1 text-warning"></i>
+          </div>
+          <h4 class="fw-bold mb-2">Relatórios e Indicadores</h4>
+          <p class="text-secondary">Acompanhe indicadores de desempenho, produtividade e SLA das solicitações.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-5">
+      <h2 class="fw-bold mb-4 text-center">Funcionalidades Principais</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item">Cadastro e gerenciamento de clientes e correspondentes</li>
+            <li class="list-group-item">Abertura e controle de solicitações jurídicas</li>
+            <li class="list-group-item">Notificações em tempo real</li>
+            <li class="list-group-item">Dashboard para acompanhamento de status</li>
+            <li class="list-group-item">Exportação de relatórios</li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item">Sistema de permissões por perfil</li>
+            <li class="list-group-item">Histórico de solicitações</li>
+            <li class="list-group-item">Comunicação integrada (e-mail e notificações)</li>
+            <li class="list-group-item">Gestão de documentos</li>
+            <li class="list-group-item">Interface amigável e responsiva</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Logo versão 4 (ícone isolado, fundo claro) como marca d'água -->
+    <img src="logo-v4-icon-light.png" alt="Marca d'água JurisConnect" class="watermark-logo">
+  </main>
+
+  <footer class="bg-primary text-light text-center py-4 mt-5 rounded-top-4 shadow-sm position-relative">
+    <div class="d-flex align-items-center justify-content-center gap-2">
+      <!-- Avatar: Logo versão 3 (ícone isolado, fundo escuro) -->
+      <img src="logo-v3-icon-dark.png" alt="JurisConnect Avatar" class="avatar-logo me-2">
+      <small>&copy; 2025 JurisConnect - Todos os direitos reservados.</small>
+    </div>
+    <a href="mailto:contato@jurisconnect.com.br" class="text-light text-decoration-underline mt-1 d-inline-block">contato@jurisconnect.com.br</a>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

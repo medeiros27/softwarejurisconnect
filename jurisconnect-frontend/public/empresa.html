@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JurisConnect - Empresas</title>
+    <link rel="icon" type="image/png" href="img/logos/logo-v3-icon-dark.png">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f6;
+        }
+        .sidebar {
+            background: #22314a;
+            color: #fff;
+            position: fixed;
+            top: 0; left: 0;
+            width: 220px;
+            height: 100vh;
+            z-index: 10;
+        }
+        .sidebar .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 0 12px 0;
+        }
+        .sidebar h5 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: normal;
+            color: #c2d1ed;
+        }
+        .sidebar hr {
+            border-color: #4b5976;
+            margin: 1.5rem 0;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            width: 100%;
+        }
+        .sidebar ul li a {
+            display: flex;
+            align-items: center;
+            color: #c2d1ed;
+            text-decoration: none;
+            padding: 12px 28px;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background: #324266;
+            color: #fff;
+        }
+        .sidebar ul li a i {
+            margin-right: 12px;
+            width: 22px;
+            text-align: center;
+        }
+        .sidebar .logout {
+            position: absolute;
+            bottom: 24px;
+            width: 100%;
+        }
+        .main-content {
+            margin-left: 220px;
+            padding: 32px 24px 24px 24px;
+        }
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            box-shadow: 0 2px 6px #0001;
+            padding: 18px 24px;
+            border-radius: 1rem;
+        }
+        .navbar .brand {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .navbar .profile {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .navbar .profile .user-btn {
+            background: none;
+            border: none;
+            font: inherit;
+            color: #22314a;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .navbar .profile .user-btn i {
+            font-size: 1.4rem;
+            margin-right: 6px;
+        }
+        .navbar .profile .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 38px;
+            background: #fff;
+            box-shadow: 0 4px 10px #0002;
+            border-radius: .5rem;
+            min-width: 140px;
+            z-index: 100;
+        }
+        .navbar .profile .dropdown a {
+            padding: 10px 20px;
+            color: #22314a;
+            text-decoration: none;
+            display: block;
+            font-size: 1rem;
+        }
+        .navbar .profile .dropdown a:hover {
+            background: #f0f3fa;
+        }
+        .navbar .profile .dropdown-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 4px 0;
+        }
+        .empresa-table-card {
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 3px 12px #0001;
+            padding: 0;
+            margin-top: 32px;
+        }
+        .empresa-table-card .table-header {
+            padding: 22px 28px 0 28px;
+        }
+        .empresa-table-card h5 {
+            margin: 0 0 10px 0;
+            font-size: 1.12rem;
+            color: #22314a;
+        }
+        .empresa-table-responsive {
+            overflow-x: auto;
+            padding: 0 28px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0;
+        }
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+            font-size: .98rem;
+        }
+        th {
+            color: #5a6a8a;
+            font-weight: 600;
+            background: #f9fafd;
+        }
+        tr {
+            border-bottom: 1px solid #f0f2f6;
+        }
+        tr:last-child {
+            border-bottom: none;
+        }
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: .4rem;
+            background: #446be7;
+            color: #fff;
+            font-size: .96rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: #22314a;
+        }
+        .btn-danger {
+            background: #e74c3c;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .search-bar {
+            margin: 18px 0 0 0;
+            display: flex;
+            gap: 8px;
+        }
+        .search-bar input {
+            padding: 8px 12px;
+            border: 1px solid #d3d8e7;
+            border-radius: .4rem;
+            width: 250px;
+        }
+        @media (max-width: 900px) {
+            .sidebar { position: static; width: 100%; height: auto; }
+            .main-content { margin-left: 0; padding: 14px 2vw; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<nav class="sidebar">
+    <div class="logo">
+        <img src="img/logos/logo-v1-dark.png" alt="Logo JurisConnect" height="70">
+        <h5>Painel Administrativo</h5>
+    </div>
+    <hr>
+    <ul>
+        <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="empresas.html" class="active"><i class="fas fa-building"></i> Empresas</a></li>
+        <li><a href="empresas_pendentes.html"><i class="fas fa-clock"></i> Empresas Pendentes</a></li>
+        <li><a href="correspondentes.html"><i class="fas fa-user-tie"></i> Correspondentes</a></li>
+        <li><a href="correspondentes_pendentes.html"><i class="fas fa-clock"></i> Correspondentes Pendentes</a></li>
+        <li><a href="solicitacoes.html"><i class="fas fa-file-alt"></i> Solicitações</a></li>
+        <li><a href="solicitacoes_pendentes.html"><i class="fas fa-clock"></i> Solicitações Pendentes</a></li>
+        <li><a href="relatorios.html"><i class="fas fa-chart-bar"></i> Relatórios</a></li>
+    </ul>
+    <div class="logout">
+        <a href="logout" style="color:#e74c3c;"><i class="fas fa-sign-out-alt"></i> Sair</a>
+    </div>
+</nav>
+<div class="main-content">
+    <div class="navbar">
+        <div class="brand">
+            <img src="img/logos/logo-v2-light.png" alt="Logo JurisConnect">
+            <span class="fs-4" style="font-weight:bold;font-size:1.4rem;color:#22314a;">JurisConnect</span>
+        </div>
+        <div class="profile">
+            <button class="user-btn" id="userBtn">
+                <i class="fas fa-user-circle"></i>
+                <span id="userName">Usuário</span>
+                <i class="fas fa-caret-down" style="margin-left:6px;"></i>
+            </button>
+            <div class="dropdown" id="userDropdown">
+                <a href="#">Perfil</a>
+                <div class="dropdown-divider"></div>
+                <a href="logout">Sair</a>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:24px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+            <h1 style="font-size:2rem;color:#22314a;">Empresas</h1>
+            <p class="text-muted" style="color:#7a8794;font-size:1.05rem;">Listagem completa das empresas cadastradas</p>
+        </div>
+        <button class="btn" id="btnNovaEmpresa"><i class="fas fa-plus"></i> Nova Empresa</button>
+    </div>
+    <form class="search-bar" onsubmit="return false;">
+        <input type="text" id="searchEmpresa" placeholder="Buscar por nome, CNPJ ou e-mail...">
+        <button class="btn" id="btnBuscar"><i class="fas fa-search"></i> Buscar</button>
+    </form>
+    <div class="empresa-table-card">
+        <div class="table-header">
+            <h5>Empresas Cadastradas</h5>
+        </div>
+        <div class="empresa-table-responsive">
+            <table id="empresasTable">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome Fantasia</th>
+                    <th>CNPJ</th>
+                    <th>E-mail</th>
+                    <th>Responsável</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Conteúdo dinâmico -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nova Empresa -->
+<div id="modalNovaEmpresa" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0009;z-index:9999;justify-content:center;align-items:center;">
+    <div style="background:#fff;padding:32px 28px;border-radius:1rem;max-width:420px;width:96vw;box-shadow:0 6px 24px #0003;position:relative;">
+        <button onclick="fecharModal()" style="position:absolute;top:14px;right:18px;background:none;border:none;font-size:1.3rem;color:#999;cursor:pointer;"><i class="fas fa-times"></i></button>
+        <h3 style="margin-top:0;color:#22314a;">Cadastrar Nova Empresa</h3>
+        <form id="formNovaEmpresa">
+            <div style="margin-bottom:10px;">
+                <label>Nome Fantasia</label>
+                <input type="text" name="company_name" required style="width:100%;padding:7px 8px;border-radius:4px;border:1px solid #d3d8e7;">
+            </div>
+            <div style="margin-bottom:10px;">
+                <label>CNPJ</label>
+                <input type="text" name="cnpj" required style="width:100%;padding:7px 8px;border-radius:4px;border:1px solid #d3d8e7;">
+            </div>
+            <div style="margin-bottom:10px;">
+                <label>E-mail</label>
+                <input type="email" name="email" required style="width:100%;padding:7px 8px;border-radius:4px;border:1px solid #d3d8e7;">
+            </div>
+            <div style="margin-bottom:10px;">
+                <label>Responsável</label>
+                <input type="text" name="contact_name" required style="width:100%;padding:7px 8px;border-radius:4px;border:1px solid #d3d8e7;">
+            </div>
+            <div style="margin-bottom:14px;">
+                <label>Status</label>
+                <select name="status" style="width:100%;padding:7px 8px;border-radius:4px;border:1px solid #d3d8e7;">
+                    <option value="ativa">Ativa</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="suspensa">Suspensa</option>
+                </select>
+            </div>
+            <button type="submit" class="btn" style="width:100%;">Salvar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Profile dropdown
+    document.getElementById('userBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('userDropdown').style.display =
+            document.getElementById('userDropdown').style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', function() {
+        document.getElementById('userDropdown').style.display = 'none';
+    });
+
+    // Usuário simulado
+    document.getElementById('userName').textContent = "Administrador";
+
+    // Modal
+    function abrirModal() {
+        document.getElementById('modalNovaEmpresa').style.display = 'flex';
+    }
+    function fecharModal() {
+        document.getElementById('modalNovaEmpresa').style.display = 'none';
+        document.getElementById('formNovaEmpresa').reset();
+    }
+    document.getElementById('btnNovaEmpresa').onclick = abrirModal;
+
+    // Simulação de dados (substitua por fetch do backend REST/JSON em produção)
+    let empresas = [
+        {id: 1, company_name: "AdvCorp", cnpj: "12.345.678/0001-90", email:"contato@advcorp.com", contact_name:"João Silva", status:"ativa"},
+        {id: 2, company_name: "JurisOne", cnpj: "99.888.777/0001-66", email:"jurisone@contato.com", contact_name:"Maria Souza", status:"pendente"},
+        {id: 3, company_name: "Lexis Ltda", cnpj: "45.212.333/0001-12", email:"lexis@ltda.com", contact_name:"Pedro Lima", status:"ativa"},
+        {id: 4, company_name: "Legalize", cnpj: "77.654.123/0001-44", email:"legalize@empresa.com", contact_name:"Ana Paula", status:"suspensa"},
+    ];
+    // Renderização da tabela
+    function renderEmpresas(lista) {
+        const tbody = document.querySelector('#empresasTable tbody');
+        tbody.innerHTML = '';
+        if (!lista.length) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;">Nenhuma empresa encontrada.</td></tr>`;
+            return;
+        }
+        lista.forEach(emp => {
+            let statusColor = "#1db954";
+            if (emp.status === "pendente") statusColor = "#e2a700";
+            else if (emp.status === "suspensa") statusColor = "#e74c3c";
+            tbody.innerHTML += `
+                <tr>
+                    <td>${emp.id}</td>
+                    <td>${emp.company_name}</td>
+                    <td>${emp.cnpj}</td>
+                    <td>${emp.email}</td>
+                    <td>${emp.contact_name}</td>
+                    <td><span style="color:#fff;padding:4px 10px;border-radius:.5rem;background:${statusColor};">${emp.status.charAt(0).toUpperCase() + emp.status.slice(1)}</span></td>
+                    <td>
+                        <a href="#" class="btn" title="Ver detalhes" onclick="alert('Funcionalidade em desenvolvimento!');return false;"><i class="fas fa-eye"></i></a>
+                        <a href="#" class="btn btn-danger" title="Excluir" onclick="excluirEmpresa(${emp.id});return false;"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+    renderEmpresas(empresas);
+
+    // Busca
+    document.getElementById('searchEmpresa').addEventListener('input', function() {
+        const termo = this.value.toLowerCase();
+        const filtradas = empresas.filter(emp =>
+            emp.company_name.toLowerCase().includes(termo) ||
+            emp.cnpj.replace(/[^\d]/g,'').includes(termo.replace(/[^\d]/g,'')) ||
+            emp.email.toLowerCase().includes(termo)
+        );
+        renderEmpresas(filtradas);
+    });
+
+    // Cadastrar nova empresa (simulação frontend)
+    document.getElementById('formNovaEmpresa').onsubmit = function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const nova = {
+            id: empresas.length ? empresas[empresas.length-1].id + 1 : 1,
+            company_name: form.company_name.value,
+            cnpj: form.cnpj.value,
+            email: form.email.value,
+            contact_name: form.contact_name.value,
+            status: form.status.value
+        };
+        empresas.push(nova);
+        fecharModal();
+        renderEmpresas(empresas);
+        alert('Empresa cadastrada com sucesso!');
+    };
+
+    // Excluir empresa (simulação frontend)
+    function excluirEmpresa(id) {
+        if (confirm("Deseja realmente excluir esta empresa?")) {
+            empresas = empresas.filter(e => e.id !== id);
+            renderEmpresas(empresas);
+        }
+    }
+</script>
+</body>
+</html>

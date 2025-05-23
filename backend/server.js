@@ -1,237 +1,196 @@
-// =======================
-// JurisConnect Server.js
-// =======================
-
-// Importações e configurações iniciais
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
-const fs = require('fs');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const multer = require('multer');
+const nodemailer = require('nodemailer');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // =======================
-// CONFIGURAÇÕES MIDDLEWARE
+// MONGODB CONFIG
 // =======================
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(()=>console.log('MongoDB conectado'))
+    .catch(err=>console.error('Erro MongoDB:', err));
 
-// Body parser
+const User = require('./models/User');
+const Company = require('./models/Company');
+const Correspondent = require('./models/Correspondent');
+
+// =======================
+// MIDDLEWARES
+// =======================
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Sessão para autenticação e flash messages
 app.use(session({
-    secret: 'jurisconnect_secret_key_123',
+    secret: process.env.SESSION_SECRET || 'jurisconnect_secret_key_123',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 2 * 60 * 60 * 1000 } // 2h
+    cookie: { maxAge: 2 * 60 * 60 * 1000 }
 }));
 app.use(flash());
-
-// Servir arquivos estáticos (HTML, CSS, JS, imagens)
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Middleware para passar mensagens flash para os templates (em caso de usar motor de template)
-app.use((req, res, next) => {
-    res.locals.success_msg = req.flash('success_msg');
-    res.locals.error_msg = req.flash('error_msg');
-    next();
+// =======================
+// MULTER CONFIG (UPLOADS)
+// =======================
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
+
+// =======================
+// NODEMAILER CONFIG (E-MAIL)
+// =======================
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+    }
 });
 
 // =======================
-// "BANCO DE DADOS" SIMULADO
+// MIDDLEWARES DE AUTENTICAÇÃO
 // =======================
-
-const DB_PATH = path.join(__dirname, 'db.json');
-// Inicializa db.json se não existir
-if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({ users: [], correspondents: [], companies: [] }, null, 2));
+function requireLogin(req, res, next) {
+    if (!req.session.user) return res.redirect('/login.html');
+    next();
 }
-function readDB() {
-    return JSON.parse(fs.readFileSync(DB_PATH));
-}
-function writeDB(db) {
-    fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+function requireAdmin(req, res, next) {
+    if (!req.session.user || req.session.user.role !== 'admin') return res.status(403).send('Acesso restrito.');
+    next();
 }
 
 // =======================
 // ROTAS PRINCIPAIS
 // =======================
-
-// Home (página inicial)
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cadastro.html')));
 
 // =======================
-// AUTENTICAÇÃO
+// CADASTRO DE USUÁRIO COM E-MAIL DE CONFIRMAÇÃO
 // =======================
-
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-// Login (POST)
-app.post('/login', (req, res) => {
-    const { email, password, user_type } = req.body;
-    const db = readDB();
-
-    let user;
-    if (user_type === 'admin') {
-        // Exemplo: usuário admin fixo
-        user = db.users.find(u => u.email === email && u.password === password && u.role === 'admin');
-    } else if (user_type === 'company') {
-        user = db.companies.find(u => u.email === email && u.password === password);
-    } else if (user_type === 'correspondent') {
-        user = db.correspondents.find(u => u.email === email && u.password === password);
-    }
-
-    if (user) {
-        req.session.user = {
-            id: user.id,
-            name: user.name,
-            role: user.role || user_type,
-            email: user.email
-        };
-        res.json({ success: true, redirect: '/dashboard' });
-    } else {
-        res.json({ success: false, message: 'Usuário ou senha inválidos!' });
-    }
-});
-
-app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
-        res.redirect('/login');
-    });
-});
-
-// =======================
-// CADASTRO DE USUÁRIO
-// =======================
-
-app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'register.html'));
-});
-
-app.post('/register', (req, res) => {
-    const db = readDB();
+app.post('/cadastro', async (req, res) => {
     const { role, name, email, password, confirm_password, terms } = req.body;
-
-    // Validações básicas
     if (!role || !name || !email || !password || !confirm_password || !terms) {
         return res.json({ success: false, message: 'Preencha todos os campos obrigatórios!' });
     }
     if (password !== confirm_password) {
         return res.json({ success: false, message: 'As senhas não coincidem.' });
     }
-    if (db.users.find(u => u.email === email) ||
-        db.companies.find(u => u.email === email) ||
-        db.correspondents.find(u => u.email === email)
-    ) {
+    // Verifica se já existe
+    const exists = await User.findOne({ email }) ||
+                   await Company.findOne({ email }) ||
+                   await Correspondent.findOne({ email });
+    if (exists) {
         return res.json({ success: false, message: 'E-mail já cadastrado!' });
     }
 
-    // Cadastro conforme o tipo
-    let user = {
-        id: Date.now() + Math.floor(Math.random() * 1000),
-        name: name,
-        email: email,
-        password: password,
-        role: role
-    };
-
+    const hashedPassword = await bcrypt.hash(password, 10);
+    let user;
     if (role === 'company') {
-        user.cnpj = req.body.document;
-        user.company_name = req.body.company_name;
-        user.business_type = req.body.business_type;
-        user.contact_name = req.body.contact_name;
-        db.companies.push(user);
+        user = new Company({ ...req.body, password: hashedPassword });
+        await user.save();
     } else if (role === 'correspondent') {
-        user.cpf = req.body.document;
-        user.oab_number = req.body.oab_number;
-        user.specialties = Array.isArray(req.body.specialties)
-            ? req.body.specialties
-            : req.body.specialties
-                ? [req.body.specialties]
-                : [];
-        db.correspondents.push(user);
+        user = new Correspondent({ ...req.body, password: hashedPassword });
+        await user.save();
     } else if (role === 'admin') {
-        db.users.push(user);
+        user = new User({ ...req.body, password: hashedPassword, role: 'admin' });
+        await user.save();
     }
 
-    writeDB(db);
-    res.json({ success: true, message: 'Cadastro realizado com sucesso! Faça login.' });
-});
-
-// =======================
-// DASHBOARD (proteção de rota)
-// =======================
-
-app.get('/dashboard', (req, res) => {
-    if (!req.session.user) {
-        return res.redirect('/login');
-    }
-    // Exemplo simples: retorna um HTML dinâmico ou pode servir um arquivo estático
-    res.send(`
-        <h2>Bem-vindo(a), ${req.session.user.name}!</h2>
-        <p>Tipo de usuário: ${req.session.user.role}</p>
-        <a href="/logout">Sair</a>
-    `);
-});
-
-// =======================
-// LISTAGEM DE USUÁRIOS (somente admin)
-// =======================
-
-app.get('/admin/users', (req, res) => {
-    if (!req.session.user || req.session.user.role !== 'admin') {
-        return res.status(403).send('Acesso restrito.');
-    }
-    const db = readDB();
-    res.json({
-        users: db.users,
-        companies: db.companies,
-        correspondents: db.correspondents
+    // Envia e-mail de boas-vindas
+    await transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: email,
+        subject: 'Bem-vindo ao JurisConnect',
+        text: `Olá, ${name}!\nSeu cadastro foi realizado com sucesso.`
     });
+
+    res.json({ success: true, message: 'Cadastro realizado! Verifique seu e-mail.' });
 });
 
 // =======================
-// EXEMPLO DE ENDPOINT PARA TERMOS/POLÍTICAS
+// LOGIN
 // =======================
-
-app.get('/terms', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'terms.html'));
+app.post('/login', async (req, res) => {
+    const { email, password, user_type } = req.body;
+    let user;
+    if (user_type === 'admin') {
+        user = await User.findOne({ email, role: 'admin' });
+    } else if (user_type === 'company') {
+        user = await Company.findOne({ email });
+    } else if (user_type === 'correspondent') {
+        user = await Correspondent.findOne({ email });
+    }
+    if (user && await bcrypt.compare(password, user.password)) {
+        req.session.user = {
+            id: user._id,
+            name: user.name,
+            role: user.role || user_type,
+            email: user.email
+        };
+        res.json({ success: true, redirect: '/dashboard.html' });
+    } else {
+        res.json({ success: false, message: 'Usuário ou senha inválidos!' });
+    }
 });
-app.get('/privacy', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'privacy.html'));
+
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => res.redirect('/login.html'));
 });
 
 // =======================
-// 404 PARA ROTAS NÃO ENCONTRADAS
+// UPLOAD DE ARQUIVOS (EXEMPLO)
 // =======================
+app.post('/upload', requireLogin, upload.single('arquivo'), (req, res) => {
+    // O campo do formulário deve ser <input type="file" name="arquivo" />
+    if (req.file) {
+        res.json({ success: true, filename: req.file.filename, url: '/uploads/' + req.file.filename });
+    } else {
+        res.json({ success: false, message: 'Nenhum arquivo enviado!' });
+    }
+});
 
+// =======================
+// DASHBOARD PROTEGIDO
+// =======================
+app.get('/dashboard.html', requireLogin, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// =======================
+// 404
+// =======================
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 // =======================
-// INICIAR SERVIDOR
+// INICIA SERVIDOR
 // =======================
-
-app.listen(PORT, () => {
-    console.log(`JurisConnect rodando em http://localhost:${PORT}`);
-    console.log('Se necessário, crie a pasta "public" e coloque seus arquivos HTML/CSS/JS lá.');
+app.listen(3000, () => console.log('Servidor rodando!'));
 });
 
 /*
-=========================
-NOTAS E INSTRUÇÕES:
-=========================
-- Coloque seus arquivos HTML, CSS, JS e imagens na pasta "public".
-- O banco de dados é um arquivo db.json na raiz do projeto.
-- Altere/adapte os endpoints conforme as necessidades do frontend.
-- Para produção, troque o "banco" por um banco real (MongoDB, MySQL etc).
-- Para ambientes reais, sempre criptografe as senhas!
+Crie um arquivo .env assim:
+MONGODB_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/jurisconnect?retryWrites=true&w=majority
+SESSION_SECRET=algumasecret
+MAIL_USER=seuemail@gmail.com
+MAIL_PASS=suaSenhaOuAppPassword
 */
