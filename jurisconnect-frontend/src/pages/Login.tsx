@@ -3,7 +3,7 @@ import { Avatar, Button, TextField, Grid, Box, Typography, Container, Alert } fr
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
 import Logo from "../components/logo";
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthContext } from "../context/AuthContext";
 import { login as apiLogin } from '../services/api';
 
 export default function Login() {
