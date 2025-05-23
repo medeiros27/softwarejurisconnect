@@ -16,18 +16,20 @@ const PORT = process.env.PORT || 3000;
 // MONGODB CONFIG
 // =======================
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(()=>console.log('MongoDB conectado'))
-    .catch(err=>console.error('Erro MongoDB:', err));
+  .then(() => console.log('Conectado ao MongoDB!'))
+  .catch(err => console.error('Erro MongoDB:', err));
 
 const User = require('./models/User');
 const Company = require('./models/Company');
 const Correspondent = require('./models/Correspondent');
+const empresasRouter = require('./routes/empresas');
 
 // =======================
 // MIDDLEWARES
 // =======================
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use('/api/empresas', empresasRouter);
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'jurisconnect_secret_key_123',
@@ -185,7 +187,6 @@ app.use((req, res) => {
 // INICIA SERVIDOR
 // =======================
 app.listen(3000, () => console.log('Servidor rodando!'));
-});
 
 /*
 Crie um arquivo .env assim:
