@@ -1,13 +1,121 @@
-body {
+/* Reset básico e fonte padrão */
+html, body, #root {
+  height: 100%;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  background-color: #f4f6fa;
+  color: #222;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Remove decoração de links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Layout flex para o app inteiro, útil para dashboards */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cabeçalho (AppBar) */
+header {
+  background-color: #1976d2;
+  color: white;
+  padding: 16px 32px;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* Container principal do conteúdo */
+.main-container {
+  flex: 1;
+  padding: 32px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Botões padrão */
+button, .MuiButton-root {
+  font-family: inherit;
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button:hover, .MuiButton-root:hover {
+  background-color: #125ca1;
+}
+
+/* Inputs padrão */
+input, select, textarea, .MuiInputBase-root {
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #1976d2;
+  outline: none;
+}
+
+/* Tabelas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+th, td {
+  padding: 12px 8px;
+  border: 1px solid #e0e0e0;
+  text-align: left;
+}
+th {
+  background-color: #e3eafc;
+  font-weight: bold;
+}
+
+/* Mensagens de erro e sucesso */
+.error-message {
+  color: #d32f2f;
+  background: #fdecea;
+  border: 1px solid #fbc2c0;
+  padding: 8px 14px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+.success-message {
+  color: #388e3c;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  padding: 8px 14px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .main-container {
+    padding: 16px 4px;
+  }
+  table, thead, tbody, th, td, tr {
+    display: block;
+    width: 100%;
+  }
+  th, td {
+    box-sizing: border-box;
+    padding: 10px 4px;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
 }
